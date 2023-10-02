@@ -1,0 +1,25 @@
+td{
+    height: 50px !important;
+    width: 50px !important;
+    border: 1px solid black !important;
+    text-align: center;
+    
+}
+
+table{
+    margin: 20px;
+    border: 2px solid black;
+}
+
+tr.border{
+    border-bottom: 2px solid black !important;
+}
+
+td.border{
+    border-right: 2px solid black !important;
+}
+
+.myinput{
+    height: 50px !important;
+    width: 50px !important;
+}
