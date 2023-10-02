@@ -22,4 +22,5 @@ td.border{
 .myinput{
     height: 50px !important;
     width: 50px !important;
+    text-align: center;
 }

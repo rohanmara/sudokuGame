@@ -4,12 +4,10 @@
     <tr *ngFor="let col of columns;  let j = index" [ngClass]="{'border': j === 2 || j === 5 }" >
       <td [ngClass]="{'border': i === 2 || i === 5 }" *ngFor="let row of rows; let i = index">
         <div *ngIf="!isSubmitted">
-          <div *ngIf="matrix[col][row].val === ' '">
-            <input type="text" class="myinput" maxlength="1" (keydown)="handleKeyPress($event, col, row)" >
+          <div>
+            <input type="text" class="myinput" maxlength="1" (keydown)="handleKeyPress($event, col, row)" [value]="matrix[col][row].val">
           </div>
-          <div *ngIf="matrix[col][row].val !== ' '">
-            {{ matrix[col][row].val }}
-          </div>
+         
         </div>
         <div *ngIf="isSubmitted">
           <div *ngIf="matrix[col][row].isInitial">
@@ -23,3 +21,7 @@
     </tr>
    </tbody>
 </table>
+
+<button class="btn btn-primary ml-2" style="margin-left: 20px;" (click)="solveSudoku()">
+  Submit
+</button>
