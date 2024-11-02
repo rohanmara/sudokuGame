@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-
+import cellMappings from './matchCells'
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
@@ -24,65 +24,65 @@ export class AppComponent {
 
 
   handleKeyPress(evt: KeyboardEvent, row:number, col:number){
-    if(evt.keyCode < 48 || evt.keyCode > 57){
+    if(evt.keyCode < 48 || evt.keyCode > 57 && evt.keyCode !== 8){
       console.log(evt)
       evt.preventDefault();
     }else{
       this.matrix[row][col].val = parseInt(evt.key);
     }
-    // if(this.isSubmitted) this.checkIfGridValid()
   }
-
-  // checkIfGridValid(){
-
-  // }
 
   solveSudoku(){
     this.changeIsInitial();
-    let simpleArr :any = this.matrix.map((x:any) => x.map((y:any) => y.val) );
-    console.log(simpleArr);
-    do{
-      for(let row in simpleArr){
-        for(let col in simpleArr[row]){
-          if(this.matrix[row][col].isInitial) continue;
-          let arr = this.checkFromNumbers(row, col);
-          let possible = [];
-          for( let num = 1; num < 10; num++ ){
-            if(arr.indexOf(num) !== -1) continue;
-            possible.push(num)
-          }
-          if(row === '3' && col === '6') console.log(arr)
-          if(possible.length === 1) this.matrix[row][col] = {val : possible[0], isInitial : false};
-  
-          this.matrix = [...this.matrix]
+    if(this.sudokuSolver(JSON.parse(JSON.stringify(this.matrix)))){
+      console.log("solved");
+    }else{
+      console.log("Unsolvable")
+    }
+  }
+
+  sudokuSolver(board:any[]):boolean{
+    let emptyIndexes:any[]= this.findEmptyCell(board);
+    let flagArr =  [];
+    if(emptyIndexes.length){
+      for(let i = 1; i < 10; i++ ){
+        board[emptyIndexes[0]][emptyIndexes[1]].val = i;
+        if(this.checkCellValid(emptyIndexes[0], emptyIndexes[1], board)){
+          flagArr.push(this.sudokuSolver(board));
+        }else{
+          return false;
         }
       }
-    } while( !this.checkIfComplete() );
-
+      console.log(emptyIndexes , flagArr.some(x => x == true));
+      let flag = flagArr.some(x => x == true);
+      if(flag) this.matrix = JSON.parse(JSON.stringify(board));
+      return !flagArr.length ? false : flag;
+    }else{
+      let isComplete = this.checkIfComplete();
+      if(!isComplete) return false;
+      let allValid = this.checkAllValid(board);
+      if(allValid && isComplete) this.matrix = JSON.parse(JSON.stringify(board));
+      return isComplete && allValid;
+    }
   }
 
-  checkFromNumbers(row: any, col:any ){
-    let checkArr = [];
-    for(let index1 of this.columns){
-      if(index1 === col) continue;
-      checkArr.push([row, index1]);
-    }
-    for(let index2 of this.columns){
-      if(index2 === row) continue;
-      checkArr.push([index2, col]);
-    }
-    let startX = Math.floor(row / 3) * 3;
-    let startY = Math.floor(col / 3) * 3;
-    for(let i = startX; i < startX + 3; i++){
-      for(let j =startY ; j < startY + 3; j++){
-        if(row === i && col === j) continue;
-        checkArr.push([i,j]);
+  findEmptyCell(board:any){
+    for(let i  in this.matrix){
+      for(let j in this.matrix[i]){
+        if(this.matrix[i][j].val === ''){
+          return [i,j];
+        }
       }
     }
-    return [...new Set(checkArr)].map((x) => {
-      return this.matrix[x[0]][x[1]].val
-    })
+    return [];
   }
+
+  checkCellValid(x:any, y:any, board: any){
+    let checkCells = cellMappings['c'+x+y];
+    return !checkCells.some((inds:any) => {
+      return board[inds[0]][inds[1]].val == board[x][y];
+    });
+  }  
 
   changeIsInitial(){
     for(let i in this.matrix){
@@ -90,6 +90,15 @@ export class AppComponent {
         if(this.matrix[i][j].val !== '') this.matrix[i][j].isInitial = true;
       }
     }
+  }
+
+  checkAllValid(board:any){
+    for(let i in board){
+      for(let j in board[i]){
+        if(!this.checkCellValid(i, j, board)) return false;
+      }
+    }
+    return true;
   }
 
   checkIfComplete(){

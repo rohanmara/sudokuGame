@@ -11,16 +11,26 @@ table{
     border: 2px solid black;
 }
 
-tr.border{
-    border-bottom: 2px solid black !important;
+tr.border-bottom{
+    border-bottom: 3px solid black !important;
 }
 
-td.border{
-    border-right: 2px solid black !important;
+td.border-right{
+    border-right: 3px solid black !important;
+}
+
+table{
+    border: 3px solid black;
 }
 
 .myinput{
     height: 50px !important;
     width: 50px !important;
     text-align: center;
+    font-size: 30px;
+    border: none;
+}
+
+.myinput:focus{
+    border: none;
 }
